@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Guild | AI Builders</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --text: #e0e0e8;
+            --muted: #6b6b80;
+            --accent: #a855f7;
+            --accent-dim: #7c3aed;
+            --gold: #f59e0b;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --red: #ef4444;
+            --epic: #a335ee;
+            --legendary: #ff8000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+                var(--bg);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content { position: relative; z-index: 1; max-width: 800px; }
+
+        .guild-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.4));
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            animation: bounce 2s infinite;
+            color: var(--muted);
+            font-size: 1.5rem;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        .section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2 .emoji { font-size: 2rem; }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--accent-dim);
+            transform: translateY(-2px);
+        }
+
+        .card-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text);
+        }
+
+        .card .subtitle {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Roles section */
+        .role-path {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-wrap: nowrap;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .role-node {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .role-node .role-name { font-weight: 700; font-size: 1rem; }
+        .role-node .role-tag { font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 0.25rem; }
+
+        .role-arrow {
+            font-size: 1.5rem;
+            color: var(--accent-dim);
+            padding: 0 0.5rem;
+        }
+
+        .role-node.gm { border-color: var(--gold); }
+        .role-node.architect { border-color: var(--epic); }
+        .role-node.tinkerer { border-color: var(--green); }
+
+        /* Achievement showcase */
+        .achievement-list { list-style: none; }
+
+        .achievement-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .achievement-item:last-child { border-bottom: none; }
+
+        .ach-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.15rem; }
+
+        .ach-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .ach-name.epic { color: var(--epic); }
+        .ach-name.legendary { color: var(--legendary); }
+        .ach-name.rare { color: var(--blue); }
+
+        .ach-flavor {
+            font-style: italic;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .ach-pts {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gold);
+        }
+
+        /* Profile mockup */
+        .profile-mock {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            max-width: 480px;
+            margin: 2rem auto;
+        }
+
+        .profile-mock .line-border { color: var(--accent-dim); }
+        .profile-mock .line-name { font-weight: 700; font-size: 1rem; }
+        .profile-mock .line-role { color: var(--muted); font-style: italic; }
+        .profile-mock .line-class { color: var(--accent); }
+        .profile-mock .line-pts { color: var(--gold); }
+        .profile-mock .line-bar { color: var(--green); }
+        .profile-mock .line-games { color: var(--blue); }
+
+        /* CTA */
+        .cta {
+            text-align: center;
+            padding: 5rem 2rem;
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.06) 0%, transparent 70%),
+                var(--bg);
+        }
+
+        .cta h2 { justify-content: center; }
+
+        .cta-text {
+            color: var(--muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .divider {
+            max-width: 900px;
+            margin: 0 auto;
+            border: none;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .role-path { flex-direction: column; }
+            .role-arrow { transform: rotate(90deg); }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="guild-icon">&#x2694;&#xFE0F;</div>
+        <h1>Neural Guild</h1>
+        <p class="tagline">AI Builders // Geeks // Makers</p>
+        <p style="color: var(--muted); max-width: 500px; margin: 0 auto;">
+            Комьюнити для тех, кто строит с AI, ломает границы и не боится экспериментировать.
+            Гильдия с рангами, достижениями и рейдами на реальные задачи.
+        </p>
+    </div>
+    <div class="scroll-hint">&#8595;</div>
+</section>
+
+<div class="section">
+    <h2><span class="emoji">&#128161;</span> Что это</h2>
+    <p style="color: var(--muted); margin-bottom: 1.5rem;">
+        Neural Guild &mdash; не чатик и не канал с новостями. Это живое сообщество людей, которые используют AI в работе и для себя.
+        От первого промпта до агентных пайплайнов в продакшене. С геймификацией, потому что прогресс должен быть видимым.
+    </p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon">&#127891;</div>
+            <h3>Обучение</h3>
+            <p class="subtitle">events = workshops</p>
+            <p>Интенсивы, демо, разборы. От базового промптинга до RAG и агентов.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#128640;</div>
+            <h3>Практика</h3>
+            <p class="subtitle">raids = hackathons</p>
+            <p>Хакатоны на реальных задачах. Собираешь пати, берёшь задачу из бэклога, решаешь.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#127942;</div>
+            <h3>Геймификация</h3>
+            <p class="subtitle">bot = Chromie</p>
+            <p>35+ достижений, очки, ранги, реферальная система. Прогресс виден всем.</p>
+        </div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+    <h2><span class="emoji">&#9876;&#65039;</span> Ранги гильдии</h2>
+    <p style="color: var(--muted); margin-bottom: 2rem;">Каждый начинает с нуля. Растёшь через дела, не через слова.</p>
+
+    <div class="role-path">
+        <div class="role-node">
+            <div class="role-name">Initiate</div>
+            <div class="role-tag">Learning the ropes</div>
+        </div>
+        <div class="role-arrow">&rarr;</div>
+        <div class="role-node tinkerer">
+            <div class="role-name">Tinkerer</div>
+            <div class="role-tag">Building weird stuff</div>
+        </div>
+        <div class="role-arrow">&rarr;</div>
+        <div class="role-node architect">
+            <div class="role-name">Architect</div>
+            <div class="role-tag">Designing systems</div>
+        </div>
+        <div class="role-arrow">&rarr;</div>
+        <div class="role-node gm">
+            <div class="role-name">Guild Master</div>
+            <div class="role-tag">Shaping the guild</div>
+        </div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+    <h2><span class="emoji">&#129534;</span> Классы</h2>
+    <p style="color: var(--muted); margin-bottom: 1.5rem;">Класс &mdash; это твоя специализация. Назначается при вступлении. Кросс-классовая помощь даёт бонусные достижения.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon">&#128302;</div>
+            <h3>Чернокнижник</h3>
+            <p class="subtitle">Backend Dev</p>
+            <p>Пишет заклинания для продакшена.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#129497;</div>
+            <h3>Маг</h3>
+            <p class="subtitle">Frontend Dev</p>
+            <p>Визуальная магия и порталы.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#128481;&#65039;</div>
+            <h3>Разбойник</h3>
+            <p class="subtitle">QA / Tester</p>
+            <p>Находит баги первым.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#128737;&#65039;</div>
+            <h3>Паладин</h3>
+            <p class="subtitle">Support</p>
+            <p>Щит клиентов от хаоса.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#9889;</div>
+            <h3>Шаман</h3>
+            <p class="subtitle">DevOps / SRE</p>
+            <p>Повелевает инфраструктурой.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#127807;</div>
+            <h3>Друид</h3>
+            <p class="subtitle">Product Manager</p>
+            <p>Танк, хил, ДД &mdash; всё в одном.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#127919;</div>
+            <h3>Охотник</h3>
+            <p class="subtitle">Analyst</p>
+            <p>Питомец &mdash; Excel.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#128128;</div>
+            <h3>Рыцарь Смерти</h3>
+            <p class="subtitle">Finance</p>
+            <p>Поднимает мёртвые бюджеты.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#10024;</div>
+            <h3>Жрец</h3>
+            <p class="subtitle">HR / People</p>
+            <p>Хилит команду.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#128520;</div>
+            <h3>Охотник на демонов</h3>
+            <p class="subtitle">Security</p>
+            <p>Видит угрозы.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#9876;&#65039;</div>
+            <h3>Воин</h3>
+            <p class="subtitle">Manager / Lead</p>
+            <p>Берёт аггро на себя.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">&#128214;</div>
+            <h3>Монах</h3>
+            <p class="subtitle">Tech Writer</p>
+            <p>Записывает историю.</p>
+        </div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+    <h2><span class="emoji">&#127942;</span> Достижения</h2>
+    <p style="color: var(--muted); margin-bottom: 1.5rem;">Не рейтинги, а коллекция. Некоторые получаешь автоматически, за некоторые нужно подать заявку. Есть секретные.</p>
+
+    <ul class="achievement-list">
+        <li class="achievement-item">
+            <span class="ach-icon">&#9876;&#65039;</span>
+            <div>
+                <div class="ach-name">Первая кровь</div>
+                <div class="ach-flavor">&laquo;Все помнят свой первый килл.&raquo;</div>
+                <div class="ach-pts">10 pts &bull; auto</div>
+            </div>
+        </li>
+        <li class="achievement-item">
+            <span class="ach-icon">&#128211;</span>
+            <div>
+                <div class="ach-name">/who</div>
+                <div class="ach-flavor">&laquo;Имя. Класс. Гильдия. Основы.&raquo;</div>
+                <div class="ach-pts">10 pts &bull; auto</div>
+            </div>
+        </li>
+        <li class="achievement-item">
+            <span class="ach-icon">&#128128;</span>
+            <div>
+                <div class="ach-name rare">Босс повержен</div>
+                <div class="ach-flavor">&laquo;Рейд ликует.&raquo;</div>
+                <div class="ach-pts">25 pts &bull; claim</div>
+            </div>
+        </li>
+        <li class="achievement-item">
+            <span class="ach-icon">&#129320;</span>
+            <div>
+                <div class="ach-name epic">Безумец</div>
+                <div class="ach-flavor">&laquo;Этот подвиг &mdash; признак истинной преданности.&raquo;</div>
+                <div class="ach-pts">50 pts &bull; auto</div>
+            </div>
+        </li>
+        <li class="achievement-item">
+            <span class="ach-icon">&#129302;</span>
+            <div>
+                <div class="ach-name legendary">Inception</div>
+                <div class="ach-flavor">&laquo;Упомянул AI в AI-сообществе. В AI-контексте. Мы слишком глубоко.&raquo;</div>
+                <div class="ach-pts">100 pts &bull; secret</div>
+            </div>
+        </li>
+        <li class="achievement-item">
+            <span class="ach-icon">&#128293;</span>
+            <div>
+                <div class="ach-name legendary">Преданный</div>
+                <div class="ach-flavor">&laquo;Серия входов: 30 дней. Может, выйдешь на улицу?&raquo;</div>
+                <div class="ach-pts">100 pts &bull; auto</div>
+            </div>
+        </li>
+        <li class="achievement-item">
+            <span class="ach-icon">&#127760;</span>
+            <div>
+                <div class="ach-name epic">Мастер на все руки</div>
+                <div class="ach-flavor">&laquo;Каждый класс знает твоё имя.&raquo;</div>
+                <div class="ach-pts">50 pts &bull; claim</div>
+            </div>
+        </li>
+    </ul>
+
+    <p style="color: var(--muted); margin-top: 1rem; font-size: 0.9rem; text-align: center;">...и ещё 30+ достижений внутри</p>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+    <h2><span class="emoji">&#127918;</span> Профиль</h2>
+    <p style="color: var(--muted); margin-bottom: 1rem;">Каждый участник &mdash; персонаж со своим листом.</p>
+
+    <div class="profile-mock">
+        <div class="line-border">&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;</div>
+        <div>&nbsp;&nbsp;<span class="line-name">&#128081; Neural Knight</span></div>
+        <div>&nbsp;&nbsp;<span class="line-role">Guild Master &mdash; Shaping the guild</span></div>
+        <div>&nbsp;&nbsp;<span class="line-class">&#128302; Чернокнижник &mdash; Backend Developer</span></div>
+        <div></div>
+        <div>&nbsp;&nbsp;<span class="line-pts">&#127941; 285 pts (235 + &#128279;50)</span> &nbsp;|&nbsp; &#127942; 12/37 &nbsp;|&nbsp; &#128172; 94</div>
+        <div>&nbsp;&nbsp;&#128197; Active: 14 days</div>
+        <div>&nbsp;&nbsp;<span class="line-games">&#127918; &#9876;&#65039; &#127984; &#128299;</span></div>
+        <div class="line-border">&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;&#9473;</div>
+        <div>&nbsp;&nbsp;&#9876;&#65039; Добро пожаловать: <span class="line-bar">&#9608;&#9608;&#9608;&#9608;</span>&#9617; 4/5</div>
+        <div>&nbsp;&nbsp;&#129514; Профессии: <span class="line-bar">&#9608;&#9608;</span>&#9617;&#9617;&#9617; 2/5</div>
+        <div>&nbsp;&nbsp;&#127984; Подземелья: <span class="line-bar">&#9608;&#9608;&#9608;</span>&#9617;&#9617; 3/5</div>
+        <div>&nbsp;&nbsp;&#128155; Репутация: <span class="line-bar">&#9608;</span>&#9617;&#9617;&#9617;&#9617; 1/8</div>
+        <div>&nbsp;&nbsp;&#128256; Мультикласс: <span class="line-bar">&#9608;</span>&#9617;&#9617;&#9617; 1/4</div>
+        <div>&nbsp;&nbsp;&#127918; Игровая: <span class="line-bar">&#9608;&#9608;</span>&#9617;&#9617; 2/4</div>
+        <div>&nbsp;&nbsp;&#128293; Подвиги: &#9617;&#9617;&#9617;&#9617;&#9617; 0/5</div>
+        <div>&nbsp;&nbsp;&#128992; Легендарные: <span class="line-bar">&#9608;</span>&#9617;&#9617;&#9617;&#9617; 1/6</div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<section class="cta">
+    <h2><span class="emoji">&#9889;</span> Подать заявку в гильдию</h2>
+    <p class="cta-text">
+        Если ты строишь с AI, ломаешь привычные процессы и не боишься экспериментировать &mdash; напиши Guild Master.
+    </p>
+    <a href="https://t.me/okutolkina" class="btn">
+        &#9876;&#65039; Связаться с нами
+    </a>
+</section>
+
+<footer class="footer">
+    <p>Neural Guild &copy; 2026 &bull; Built with AI, obviously</p>
+    <p style="margin-top: 0.5rem;">Bot: Chromie &bull; Stack: Python + aiogram + PostgreSQL</p>
+</footer>
+
+</body>
+</html>
